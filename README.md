@@ -19,27 +19,27 @@ This project builds a complete **end-to-end ML pipeline** to classify whether a 
 
 ## 🛠️ Tools & Technologies Used
 
-### 1. ![Airflow](https://www.svgrepo.com/show/354260/apache-airflow-icon.svg) Apache Airflow
+### 1. Apache Airflow
 
 * **Why:** Workflow orchestration and scheduling of ML pipeline steps
 * **How:** DAG defines and links pipeline tasks (ETL → train → evaluate → package)
 
-### 2. ![Docker](https://www.svgrepo.com/show/349375/docker.svg) Docker
+### 2. Docker
 
 * **Why:** Containerization ensures consistency across dev, test, and prod environments
 * **How:** Each stage (ingestion, train, API) runs in its own container
 
-### 3. ![Docker Compose](https://www.svgrepo.com/show/374110/docker-compose.svg) Docker Compose
+### 3. Docker Compose
 
 * **Why:** Simplifies multi-container deployment
 * **How:** Defines and launches Airflow, services, and REST API together
 
-### 4. ![REST API](https://www.svgrepo.com/show/354200/api.svg) REST API
+### 4. REST API
 
 * **Why:** Enables real-time inference for single customer data
 * **How:** A FastAPI/Flask endpoint consumes serialized model for predictions
 
-### 5. ![Python](https://www.svgrepo.com/show/376344/python.svg) Python
+### 5. Python
 
 * **Why:** Core language for data processing, ML, and serving
 * **How:** Code for data ingestion, preprocessing, model training, and inference
