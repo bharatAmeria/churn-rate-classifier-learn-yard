@@ -142,3 +142,52 @@ Then access:
 
 * **Airflow UI:** [http://localhost:8080](http://localhost:8080)
 * **API Endpoint:** [http://localhost:8000/predict](http://localhost:8000/predict)
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/house-price-ml.git
+cd house-price-ml
+```
+
+### 2. Set Up Virtual Environment
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 3. Airflow Setup
+        
+      * First install Docker desktop and launch Docker.
+      * follow the below command to setup Airflow.
+
+      ```bash
+      <!-- Download docker-compose.yaml file -->
+      curl -LfO 'https://airflow.apache.org/docs/apache-airflow/3.0.2/docker-compose.yaml'  
+
+      <!-- Create necessary folder and environment variables. -->
+      mkdir -p ./dags ./logs ./plugins ./configecho -e "AIRFLOW_UID=$(id -u)" > .env
+
+      <!-- To run airflow-cli airflow config list  -->
+      docker compose run airflow-cli airflow config list
+
+      <!-- Initilaise airflow -->
+      docker compose up airflow-init      
+      ```
+      * To Access Airflow  
+      ![Login page](assets/airflow_login_page.png)
+
+      🧑‍💻 Use:
+      Username: airflow
+      Password: airflow
+
+      ```bash
+      http://localhost:8080/  
+      ```
+      * On succesfull login. UI look like.
+      ![Home page](assets/airflow_home_page.png)
+
+
+
