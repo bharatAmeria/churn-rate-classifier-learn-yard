@@ -191,17 +191,6 @@ docker compose up airflow-init
 
 ![Airflow Home](assets/airflow_home_page.png)
 
----
-
-## 🧠 Future Improvements
-
-* Integrate MLflow for experiment tracking
-* Add model versioning support
-* CI/CD pipeline for automated deployment
-* Monitoring via Grafana + Prometheus
-
----
-
 ## 📬 Contact
 
-For feedback or contributions, reach out via [LinkedIn](https://www.linkedin.com/in/your-profile/) or open an issue in the repository.
+For feedback or contributions, reach out via [LinkedIn](https://www.linkedin.com/in/bharat-aameriya-24579a261/) or open an issue in the repository.
