@@ -1,52 +1,52 @@
 # 📊 Customer Churn Prediction Pipeline
 
-This project builds a complete **end-to-end ML pipeline** to classify whether a customer is likely to churn. The system is modular, reproducible, and production-ready, built using **Apache Airflow**, **Docker**, and exposed through a **REST API**.
+This project demonstrates a **production-ready, end-to-end Machine Learning pipeline** to predict whether a customer is likely to churn. Built with **Apache Airflow**, **Docker**, and exposed via a **REST API**, the architecture is modular, scalable, and reproducible.
 
 ---
 
 ## 🚀 Project Overview
 
-* **Objective:** Predict if a customer is likely to churn based on historical data.
-* **Architecture:**
+* **Objective:** Predict customer churn based on historical behavioral data.
+* **Pipeline Highlights:**
 
-  * Pipeline managed as **Airflow DAGs**
-  * All components are **Dockerized**
-  * Deployment via **Docker Compose** on a virtual machine
-  * Separate tasks for ingestion, transformation, training, evaluation, packaging
-  * REST API for single-row inference
-
----
-
-## 🛠️ Tools & Technologies Used
-
-### 1. Apache Airflow
-
-* **Why:** Workflow orchestration and scheduling of ML pipeline steps
-* **How:** DAG defines and links pipeline tasks (ETL → train → evaluate → package)
-
-### 2. Docker
-
-* **Why:** Containerization ensures consistency across dev, test, and prod environments
-* **How:** Each stage (ingestion, train, API) runs in its own container
-
-### 3. Docker Compose
-
-* **Why:** Simplifies multi-container deployment
-* **How:** Defines and launches Airflow, services, and REST API together
-
-### 4. REST API
-
-* **Why:** Enables real-time inference for single customer data
-* **How:** A FastAPI/Flask endpoint consumes serialized model for predictions
-
-### 5. Python
-
-* **Why:** Core language for data processing, ML, and serving
-* **How:** Code for data ingestion, preprocessing, model training, and inference
+  * Orchestrated with **Apache Airflow DAGs**
+  * **Dockerized** components for reproducibility
+  * Deployed using **Docker Compose**
+  * Distinct stages: data ingestion → transformation → training → evaluation → packaging
+  * Real-time inference through a **REST API**
 
 ---
 
-## 🔄 Project Flow
+## 🛠️ Tools & Technologies
+
+### 🌀 Apache Airflow
+
+* **Purpose:** Workflow orchestration of ETL and ML tasks.
+* **How:** DAGs manage and link pipeline stages.
+
+### 🐳 Docker
+
+* **Purpose:** Environment consistency across development, testing, and production.
+* **How:** Each pipeline stage runs in its own container.
+
+### 🧹 Docker Compose
+
+* **Purpose:** Simplifies multi-container orchestration.
+* **How:** Spins up Airflow, pipeline services, and the REST API.
+
+### ⚡ REST API (FastAPI / Flask)
+
+* **Purpose:** Exposes a `/predict` endpoint for real-time inference.
+* **How:** Loads serialized ML model and processes incoming data.
+
+### 🐍 Python
+
+* **Purpose:** Core language for ML, data preprocessing, and deployment.
+* **How:** Powers each task script and the API backend.
+
+---
+
+## 🔄 Project Workflow
 
 ```mermaid
 graph TD;
@@ -60,40 +60,40 @@ graph TD;
     end
 ```
 
-### Step-by-Step Breakdown
+### 📌 Step-by-Step Flow
 
 1. **Data Ingestion**
 
-   * Load raw data from a CSV, database, or API
-   * Saved into a shared volume for next steps
+   * Load raw data from CSV/database/API.
+   * Store in shared volume for pipeline access.
 
 2. **Data Transformation**
 
-   * Clean, encode, and normalize features
-   * Prepare final dataset for modeling
+   * Clean, encode, and normalize features.
+   * Output ready for model training.
 
 3. **Model Training**
 
-   * Train a classification model (e.g., XGBoost/RandomForest)
-   * Save model as serialized `.pkl`
+   * Train a classification model (e.g., RandomForest, XGBoost).
+   * Save as `.pkl` for later inference.
 
 4. **Model Evaluation**
 
-   * Evaluate model using metrics like F1-score, ROC-AUC
-   * Optional logging to a dashboard/DB
+   * Evaluate using metrics like **F1-score**, **ROC-AUC**.
+   * Optionally log results for dashboarding.
 
 5. **Model Packaging**
 
-   * Prepare model artifacts and config files for deployment
+   * Bundle model and config for serving.
 
-6. **Deployment & Inference API**
+6. **API Deployment**
 
-   * REST API (FastAPI or Flask) loads model
-   * Supports single-row input and returns churn prediction
+   * Load model via FastAPI/Flask.
+   * Accept single-row JSON input, return churn prediction.
 
 ---
 
-## 📦 Folder Structure
+## 📂 Folder Structure
 
 ```
 ├── dags/
@@ -108,7 +108,7 @@ graph TD;
 ├── api/
 │   └── app.py
 ├── data/
-│   └── raw, processed
+│   └── raw/ processed/
 ├── models/
 │   └── trained_model.pkl
 ```
@@ -117,77 +117,91 @@ graph TD;
 
 ## 📈 Results & Output
 
-* Logs for each stage stored by Airflow
-* Metrics printed in evaluation logs
-* API exposes `/predict` endpoint
+* Logs from each step managed by Airflow.
+* Evaluation metrics printed to logs or exported.
+* Inference API exposed at `/predict`.
 
 ---
 
-## 💡 Benefits
+## ✅ Key Benefits
 
-* Reproducible and modular architecture
-* Easily scalable and portable
-* Clean separation of concerns (ETL, modeling, serving)
-* Real-time API ready for production
+* Modular and maintainable architecture.
+* Easily deployable across environments.
+* Clean separation of concerns.
+* Real-time prediction ready via REST API.
 
 ---
 
-## 📌 To Run the Project
+## 🚀 Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/customer-churn-ml.git
+cd customer-churn-ml
+```
+
+### 2. Set Up Virtual Environment (Optional)
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 3. Run with Docker Compose
 
 ```bash
 docker-compose up --build
 ```
 
-Then access:
+Access:
 
 * **Airflow UI:** [http://localhost:8080](http://localhost:8080)
 * **API Endpoint:** [http://localhost:8000/predict](http://localhost:8000/predict)
 
-### 1. Clone the Repository
+---
+
+## ⚙️ Airflow Setup (Manual Option)
+
+> Ensure Docker Desktop is installed and running.
 
 ```bash
-git clone https://github.com/your-username/house-price-ml.git
-cd house-price-ml
+# Download Docker Compose file
+curl -LfO 'https://airflow.apache.org/docs/apache-airflow/3.0.2/docker-compose.yaml'
+
+# Create folders and env file
+mkdir -p ./dags ./logs ./plugins
+echo -e "AIRFLOW_UID=$(id -u)" > .env
+
+# Initialize Airflow
+docker compose up airflow-init
 ```
 
-### 2. Set Up Virtual Environment
+### 🔐 Airflow Login
 
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
+* Username: `airflow`
+* Password: `airflow`
 
-### 3. Airflow Setup
-        
-      * First install Docker desktop and launch Docker.
-      * follow the below command to setup Airflow.
+#### 🔎 Login Page
 
-      ```bash
-      <!-- Download docker-compose.yaml file -->
-      curl -LfO 'https://airflow.apache.org/docs/apache-airflow/3.0.2/docker-compose.yaml'  
+![Airflow Login](assets/airflow_login_page.png)
 
-      <!-- Create necessary folder and environment variables. -->
-      mkdir -p ./dags ./logs ./plugins ./configecho -e "AIRFLOW_UID=$(id -u)" > .env
+#### 🏠 Home Page
 
-      <!-- To run airflow-cli airflow config list  -->
-      docker compose run airflow-cli airflow config list
+![Airflow Home](assets/airflow_home_page.png)
 
-      <!-- Initilaise airflow -->
-      docker compose up airflow-init      
-      ```
-      * To Access Airflow  
-      ![Login page](assets/airflow_login_page.png)
+---
 
-      🧑‍💻 Use:
-      Username: airflow
-      Password: airflow
+## 🧠 Future Improvements
 
-      ```bash
-      http://localhost:8080/  
-      ```
-      * On succesfull login. UI look like.
-      ![Home page](assets/airflow_home_page.png)
+* Integrate MLflow for experiment tracking
+* Add model versioning support
+* CI/CD pipeline for automated deployment
+* Monitoring via Grafana + Prometheus
 
+---
 
+## 📬 Contact
 
+For feedback or contributions, reach out via [LinkedIn](https://www.linkedin.com/in/your-profile/) or open an issue in the repository.
