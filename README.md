@@ -22,8 +22,8 @@ This project demonstrates a **production-ready, end-to-end Machine Learning pipe
 ### 🌀 Apache Airflow
 
 * **Purpose:** Workflow orchestration of ETL and ML tasks.
-* **How:** DAGs manage and link pipeline stages.
-
+* **How:** How: DAGs manage and link pipeline stages. In this project, Airflow is responsible for ingesting multiple raw CSV files over time from Google Drive, triggering the data processing pipeline after each ingestion. Once the data is cleaned and prepared, it's passed downstream for model training.
+  
 ### 🐳 Docker
 
 * **Purpose:** Environment consistency across development, testing, and production.
@@ -43,83 +43,6 @@ This project demonstrates a **production-ready, end-to-end Machine Learning pipe
 
 * **Purpose:** Core language for ML, data preprocessing, and deployment.
 * **How:** Powers each task script and the API backend.
-
----
-
-## 🔄 Project Workflow
-
-```mermaid
-graph TD;
-    A[Data Ingestion] --> B[Data Transformation];
-    B --> C[Model Training];
-    C --> D[Model Evaluation];
-    D --> E[Model Packaging];
-    E --> F[REST API Deployment];
-    subgraph Orchestrated by Airflow
-    A --> B --> C --> D --> E
-    end
-```
-
-### 📌 Step-by-Step Flow
-
-1. **Data Ingestion**
-
-   * Load raw data from CSV/database/API.
-   * Store in shared volume for pipeline access.
-
-2. **Data Transformation**
-
-   * Clean, encode, and normalize features.
-   * Output ready for model training.
-
-3. **Model Training**
-
-   * Train a classification model (e.g., RandomForest, XGBoost).
-   * Save as `.pkl` for later inference.
-
-4. **Model Evaluation**
-
-   * Evaluate using metrics like **F1-score**, **ROC-AUC**.
-   * Optionally log results for dashboarding.
-
-5. **Model Packaging**
-
-   * Bundle model and config for serving.
-
-6. **API Deployment**
-
-   * Load model via FastAPI/Flask.
-   * Accept single-row JSON input, return churn prediction.
-
----
-
-## 📂 Folder Structure
-
-```
-├── dags/
-│   └── churn_pipeline_dag.py
-├── docker/
-│   ├── Dockerfile.ingest
-│   ├── Dockerfile.transform
-│   ├── Dockerfile.train
-│   ├── Dockerfile.evaluate
-│   ├── Dockerfile.api
-├── docker-compose.yml
-├── api/
-│   └── app.py
-├── data/
-│   └── raw/ processed/
-├── models/
-│   └── trained_model.pkl
-```
-
----
-
-## 📈 Results & Output
-
-* Logs from each step managed by Airflow.
-* Evaluation metrics printed to logs or exported.
-* Inference API exposed at `/predict`.
 
 ---
 
