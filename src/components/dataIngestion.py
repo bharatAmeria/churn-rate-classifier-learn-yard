@@ -3,18 +3,14 @@ import sys
 import zipfile
 
 import gdown
-import pymongo
-import pandas as pd
 
 from src.logger import logging
 from src.exception import MyException
 from src.config import CONFIG
-from dotenv import load_dotenv
 
-# Load environment variables from .env
-load_dotenv()
 
-class UploadData:
+
+class IngestData:
     """
     Data ingestion class which ingests data from the source and returns a DataFrame.
     """
@@ -60,32 +56,3 @@ class UploadData:
         except Exception as e:
             logging.error("Error occurred while extracting zip file", exc_info=True)
             raise MyException(e, sys)
-
-    def push_dataframe_to_mongodb(df, db_name, collection_name):
-        """
-        Push a pandas DataFrame to MongoDB using connection string from .env.
-
-        Parameters:
-            df (pd.DataFrame): Data to upload
-            db_name (str): MongoDB database name
-            collection_name (str): Collection name inside the database
-
-        Returns:
-            inserted_ids (list): List of inserted document IDs
-        """
-        # Convert DataFrame to dictionary
-        data = df.to_dict(orient='records')
-
-        # Get connection string from environment
-        connection_url = os.getenv("MONGODB_URI")
-
-        if not connection_url:
-            raise ValueError("MONGODB_URI not found in environment variables")
-
-        # Connect and insert
-        client = pymongo.MongoClient(connection_url)
-        database = client[db_name]
-        collection = database[collection_name]
-        result = collection.insert_many(data)
-
-        return result.inserted_ids

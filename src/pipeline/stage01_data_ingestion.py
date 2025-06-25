@@ -1,10 +1,9 @@
 import sys
 
 from src.constants import *
+from src.components.dataIngestion import IngestData
 from src.logger import logging
 from src.exception import MyException
-from src.data.data_ingestion import IngestData
-from src.config.configuration import ConfigurationManager
 
 class DataIngestionTrainingPipeline:
     def __init__(self):
@@ -12,9 +11,7 @@ class DataIngestionTrainingPipeline:
 
     @staticmethod
     def main():
-        config = ConfigurationManager()
-        data_ingestion_config = config.get_data_ingestion_config()
-        data_ingestion = IngestData(config=data_ingestion_config)
+        data_ingestion = IngestData()
         data_ingestion.download_file()
         data_ingestion.extract_zip_file()
 
