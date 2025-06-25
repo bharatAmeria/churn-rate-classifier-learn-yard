@@ -1,7 +1,7 @@
 import os
 import sys
 import zipfile
-
+import certifi
 import gdown
 import pymongo
 from dotenv import load_dotenv
@@ -80,7 +80,7 @@ class UploadData:
             raise ValueError("MONGODB_URI not found in environment variables")
 
         # Connect and insert
-        client = pymongo.MongoClient(connection_url)
+        client = pymongo.MongoClient(connection_url, tlsCAFile=certifi.where())
         database = client[db_name]
         collection = database[collection_name]
         result = collection.insert_many(data)

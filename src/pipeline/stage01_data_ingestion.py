@@ -14,7 +14,7 @@ class DataUploadPipeline:
         upload = UploadData()
         upload.download_file()
         upload.extract_zip_file()
-        df = pd.read_csv("artifacts/Train.csv")
+        df = pd.read_csv("artifacts/Bank Customer Churn Prediction.csv")
 
         # Call the function
         inserted = upload.push_dataframe_to_mongodb(df, "Proj1", "Proj1-Data")
