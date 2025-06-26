@@ -1,10 +1,8 @@
 import sys
-import pandas as pd
-from src.constants import *
-from src.config import CONFIG
 from src.logger import logging
 from src.exception import MyException
-from src.components.data_processing import DataPreProcessing, DataPreprocessStrategy
+from src.components.dataIngestion import IngestData
+from src.constants import *
 
 class DataProcessingPipeline:
     def __init__(self):
@@ -12,16 +10,11 @@ class DataProcessingPipeline:
 
     @staticmethod
     def main():
-        config = CONFIG["data"]
-        
-        data = pd.read_csv(config["data_path"])
+        ingestor = IngestData()
+        ingestor.initiate_data_ingestion()
+        df = ingestor.export_data_into_feature_store()
 
-        logging.info(">>>>>Data Preprocessing Started...<<<<<")
-        data_cleaning = DataPreProcessing(data=data,strategy=DataPreprocessStrategy())
-        cleaned_data = data_cleaning.handle_data()
-        logging.info(">>>>>Data Preprocessing Completed<<<<<\n")
-
-        return cleaned_data
+        return df
 
 
 if __name__ == '__main__':

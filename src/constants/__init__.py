@@ -3,6 +3,11 @@ from pathlib import Path
 CONFIG_FILE_PATH = Path("config/config.yaml")
 PARAMS_FILE_PATH = Path("params.yaml")
 
+# For MongoDB connection
+DATABASE_NAME = "Proj1"
+COLLECTION_NAME = "Proj1-Data"
+MONGODB_URL_KEY = "MONGODB_URL"
+
 """
 ---------------------------------------------------------------
 Training Pipeline related constant start with DATA_INGESTION VAR NAME

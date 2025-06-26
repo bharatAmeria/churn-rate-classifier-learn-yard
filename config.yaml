@@ -5,5 +5,18 @@ data:
   unzip_dir: artifacts
   data_path: artifacts/Train.csv
 
+  feature_store : "artifacts/data_ingestion/feature_store/data.csv"
+  TRAIN_TEST_SPLIT_RATIO: 0.25
+  FILE_NAME : "artifacts/data_ingestion/feature_store/data.csv"
+  TRAIN_FILE_NAME: "artifacts/data_ingestion/ingested/train.csv"
+  TEST_FILE_NAME: "artifacts/data_ingestion/ingested/test.csv"
+
+
 processed_data_path: "artifacts/processed_data.csv"
 model: "app/model.pkl"
+
+
+# For MongoDB connection
+DATABASE_NAME : "Proj1"
+COLLECTION_NAME : "Proj1-Data"
+MONGODB_URL_KEY : "MONGODB_URL"
