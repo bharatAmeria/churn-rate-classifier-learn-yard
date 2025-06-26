@@ -1,25 +1,25 @@
 import os
 import sys
-from abc import ABC, abstractmethod
-from typing import Union
 from src.config import CONFIG
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from src.logger import logging
 from src.exception import MyException
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
-class DataStrategy(ABC):
-    """
-    Abstract Class defining strategy for handling data
-    """
-    @abstractmethod
-    def handle_data(self, data: pd.DataFrame) -> Union[pd.DataFrame, pd.Series]:
-        pass
-
-class DataPreprocessStrategy(DataStrategy):
+class DataPreprocess:
     """
     Data preprocessing strategy which preprocesses the data.
     """
+
+    def __init__(self):
+        """Initialize the data ingestion class."""
+        self.config = CONFIG["data_ingest"]
+        self.df = None
+        logging.info("Data Processing class initialized.")
+
+
     def handle_data(self, data: pd.DataFrame) -> pd.DataFrame:
         """
         Removes columns which are not required, fills missing values with median average values,
@@ -27,45 +27,60 @@ class DataPreprocessStrategy(DataStrategy):
         """
         try:
              df = data
-             df['Item_Weight'] = df['Item_Weight'].fillna(df['Item_Weight'].mean())
-             df['Outlet_Size'].mode()
 
-             mode_of_outlet_size = df.pivot_table(values='Outlet_Size',columns='Outlet_Type',aggfunc=lambda x: x.mode()[0])
-             miss_values = df['Outlet_Size'].isnull()   
-             df.loc[miss_values, 'Outlet_Size'] = df.loc[miss_values,'Outlet_Type'].apply(lambda x: mode_of_outlet_size[x])
+             df.drop(['_id', 'customer_id'], axis=1)
 
-             df.replace({'Item_Fat_Content': {'low fat':'Low Fat','LF':'Low Fat', 'reg':'Regular'}}, inplace=True)
+             le = LabelEncoder()
 
-             encoder = LabelEncoder()
-
-             df['Item_Identifier'] = encoder.fit_transform(df['Item_Identifier'])
-             df['Item_Fat_Content'] = encoder.fit_transform(df['Item_Fat_Content'])
-             df['Item_Type'] = encoder.fit_transform(df['Item_Type'])
-             df['Outlet_Identifier'] = encoder.fit_transform(df['Outlet_Identifier'])
-             df['Outlet_Size'] = encoder.fit_transform(df['Outlet_Size'])
-             df['Outlet_Location_Type'] = encoder.fit_transform(df['Outlet_Location_Type'])
-             df['Outlet_Type'] = encoder.fit_transform(df['Outlet_Type'])
+             df['gender'] = le.fit_transform(df['gender'])
+             df['country'] = le.fit_transform(df['country'])
 
              save_path = CONFIG["processed_data_path"]
              os.makedirs(os.path.dirname(save_path), exist_ok=True)
              df.to_csv(save_path, index=False)
              logging.info(f"Successfully saved processed data to {save_path}")
 
+             self.df = df
+             return df
+
         except Exception as e:
             logging.error("Error occurred in Processing data", exc_info=True)
             raise MyException(e, sys)
         
-class DataPreProcessing(DataStrategy):
-    """
-    Data cleaning class which preprocesses the data
-    """
-    def __init__(self, data: pd.DataFrame, strategy: DataStrategy) -> None:
-        """Initializes the DataCleaning class with a specific strategy."""
-        logging.info("Initializing DataPreProcessing with given strategy")
-        self.df = data
-        self.strategy = strategy
+    def split_data_as_train_test(self) -> None:
+        """
+        Method Name :   split_data_as_train_test
+        Description :   This method splits the dataframe into train set and test set based on split ratio 
+        
+        Output      :   Folder is created in s3 bucket
+        On Failure  :   Write an exception log and then raise an exception
+        """
+        logging.info("Entered split_data_as_train_test method of Data_Ingestion class")
 
-    def handle_data(self) -> Union[pd.DataFrame, pd.Series]:
-        """Handle data based on the provided strategy"""
-        logging.info("Handling data using the provided strategy")
-        return self.strategy.handle_data(self.df)
+        try:
+            if self.df is None:
+                raise ValueError("Data must be processed first using `handle_data()` before splitting.")
+
+            X = self.df.drop(['_id', 'churn', 'customer_id'], axis=1)
+            y = self.df.drop('_id', axis=1)
+            y = self.df['churn']
+            train_set, test_set, _, _ = train_test_split(X, y, test_size=self.config["TRAIN_TEST_SPLIT_RATIO"], random_state=42)
+            logging.info("Performed train test split on the dataframe")
+            logging.info("Exited split_data_as_train_test method of Data_Ingestion class")
+
+            sclr = StandardScaler()
+            X_train = sclr.fit_transform(train_set)
+            X_test = sclr.fit_transform(test_set)
+
+            dir_path = os.path.dirname(self.config["FILE_NAME"])
+            os.makedirs(dir_path,exist_ok=True)
+            
+            logging.info(f"Exporting train and test file path.")
+            os.makedirs(os.path.dirname(self.config["TRAIN_FILE_NAME"]), exist_ok=True)
+            pd.DataFrame(X_train).to_csv(self.config["TRAIN_FILE_NAME"], index=False)
+            pd.DataFrame(X_test).to_csv(self.config["TEST_FILE_NAME"], index=False, header=True)
+
+            logging.info(f"Exported train and test file path.")
+        except Exception as e:
+            raise MyException(e, sys)
+        

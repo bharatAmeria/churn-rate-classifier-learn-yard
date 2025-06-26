@@ -4,7 +4,7 @@ from src.exception import MyException
 from src.components.dataIngestion import IngestData
 from src.constants import *
 
-class DataProcessingPipeline:
+class DataIngestionPipeline:
     def __init__(self):
         pass
 
@@ -12,16 +12,14 @@ class DataProcessingPipeline:
     def main():
         ingestor = IngestData()
         ingestor.initiate_data_ingestion()
-        df = ingestor.export_data_into_feature_store()
-
-        return df
+        return
 
 
 if __name__ == '__main__':
     try:
         logging.info(f"*******************")
         logging.info(f">>>>>> stage {PRE_PROCESSING_STAGE_NAME} started <<<<<<")
-        obj = DataProcessingPipeline()
+        obj = DataIngestionPipeline()
         obj.main()
         logging.info(f">>>>>> stage {PRE_PROCESSING_STAGE_NAME} completed <<<<<<\nx==========x")
     except MyException as e:

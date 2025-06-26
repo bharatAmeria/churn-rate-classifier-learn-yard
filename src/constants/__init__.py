@@ -31,7 +31,7 @@ Data ingestion related constant
 ---------------------------------------------------------------
 """
 INGESTION_STAGE_NAME = "Data Ingestion"
-
+DATA_UPLOAD_STAGE_NAME = "Data Upload"
 """
 ---------------------------------------------------------------
 Data PrePrecessing related constant 

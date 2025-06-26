@@ -18,7 +18,7 @@ class UploadData:
 
     def __init__(self):
         """Initialize the data ingestion class."""
-        self.config = CONFIG["data"]
+        self.config = CONFIG["data_upload"]
         logging.info("Data Ingestion class initialized.")
 
     def download_file(self):
