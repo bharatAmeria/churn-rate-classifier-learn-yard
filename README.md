@@ -64,87 +64,120 @@ git clone https://github.com/your-username/customer-churn-ml.git
 cd customer-churn-ml
 ```
 
-### 2. Set Up Virtual Environment (Optional)
+## 2️⃣ Environment Setup (Optional but Recommended)
 
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # Windows: venv\Scripts\activate
-    pip install -r requirements.txt
-    ```
+```bash
+# Create virtual environment
+python -m venv venv
 
-  - Run template.py file 
-  - Install requirements :- Run testEnvironment file which test virtual env and install requirements.
-  - Modify setup.py file and project.toml files for Author changes.
-  
-### 3. Data Ingestion
-   
-  -  Raw is downloaded form Google Drive and extract zip file and push the data to MongoDB.
-  -  Now from MongoDB the data is ingested for processing.
-  -  After data processing train_test_split performed 
-  -  All this is added in the src/components directory
+# Activate environment
+source venv/bin/activate           # On Windows: venv\Scripts\activate
 
-### 4. MongoDB Setup
-  
-  - Sign up in MongoDB [Link](https://www.mongodb.com)
-  - Create Orgnainsation.
-  ![Mongo Organisation](assets/Org.png)
+# Install dependencies
+pip install -r requirements.txt
+```
 
-  - Create new project.
-  ![New Project](assets/proj.png)
+🔍 **Alternative:**  
+Run the `testEnvironment.py` file to automatically set up the virtual environment and install dependencies.
 
-  - After creating project build cluster.
-  ![Project Home](assets/cluster.png)
+🛠 Modify `setup.py` and `pyproject.toml` to reflect your author and project information.
 
-  - Set cluster to free which allow us to store data upto 512 MBs. Create deployment all settings are default.
-  ![Cluster Building](assets/cluster_making.png)
+---
 
-  - Ater cluster mkaing you will home page like that.
-  ![Cluster Home](assets/cluster_home.png)
+## 3️⃣ Data Ingestion Pipeline
 
-  - Now copy connection string by clicking on the connect button. On pop up screen in the drives you will see a connection string copy that and store it in your env folder under the name MONGO_URI
+1. **Download Raw Data:**
+   - Data is fetched from **Google Drive** and unzipped.
 
-### 4. Run with Docker Compose
+2. **Push to MongoDB:**
+   - Extracted raw data is uploaded to **MongoDB Atlas**.
+
+3. **Data Processing:**
+   - Data is retrieved from MongoDB for processing and cleaning.
+
+4. **Train-Test Split:**
+   - Cleaned data is split into training and testing sets.
+
+📂 All related scripts are available in `src/components/`.
+
+---
+
+## 4️⃣ MongoDB Atlas Setup
+
+1. **Sign Up** at [mongodb.com](https://www.mongodb.com).
+2. **Create Organization**  
+   ![Mongo Organisation](assets/org.png)
+
+3. **Create a New Project**  
+   ![New Project](assets/proj.png)
+
+4. **Build a Free Cluster**  
+   ![Project Home](assets/cluster.png)
+
+5. **Configure Cluster (Default Settings)**  
+   ![Cluster Building](assets/cluster_making.png)
+
+6. **Access Cluster Home Page**  
+   ![Cluster Home](assets/cluster_home.png)
+
+7. **Connect Application:**
+   - Click `Connect` → Choose `Drivers` → Copy the connection string.
+   - Save it in `.env` as:
+     ```env
+     MONGO_URI="your_mongo_connection_string"
+     ```
+
+---
+
+## 5️⃣ Run with Docker Compose
 
 ```bash
 docker-compose up --build
 ```
 
-Access:
+### 🔗 Access Services:
 
-* **Airflow UI:** [http://localhost:8080](http://localhost:8080)
-* **API Endpoint:** [http://localhost:8000/predict](http://localhost:8000/predict)
+- **Airflow UI:** [http://localhost:8080](http://localhost:8080)  
+- **API Endpoint (FastAPI):** [http://localhost:8000/predict](http://localhost:8000/predict)
 
 ---
 
-## ⚙️ Airflow Setup (Manual Option)
+## ⚙️ Manual Airflow Setup (Optional)
 
-> Ensure Docker Desktop is installed and running.
+> 💡 Only needed if you're not using Docker Compose.
 
 ```bash
-# Download Docker Compose file
+# Get the official Docker Compose file for Airflow
 curl -LfO 'https://airflow.apache.org/docs/apache-airflow/3.0.2/docker-compose.yaml'
 
-# Create folders and env file
+# Set up project directories
 mkdir -p ./dags ./logs ./plugins
+
+# Create .env file with user ID
 echo -e "AIRFLOW_UID=$(id -u)" > .env
 
-# Initialize Airflow
+# Initialize Airflow metadata database
 docker compose up airflow-init
 ```
 
-### 🔐 Airflow Login
+### 🔐 Airflow Login Credentials
 
-* Username: `airflow`
-* Password: `airflow`
+- **Username:** `airflow`  
+- **Password:** `airflow`
 
-#### 🔎 Login Page
-
+#### Login Interface  
 ![Airflow Login](assets/airflow_login_page.png)
 
-#### 🏠 Home Page
-
+#### Airflow Dashboard  
 ![Airflow Home](assets/airflow_home_page.png)
+
+---
 
 ## 📬 Contact
 
-For feedback or contributions, reach out via [LinkedIn](https://www.linkedin.com/in/bharat-aameriya-24579a261/) or open an issue in the repository.
+For queries, feedback, or contributions:
+
+👤 [Bharat Aameriya](https://www.linkedin.com/in/bharat-aameriya-24579a261/)  
+📂 Feel free to open an issue or submit a pull request on this repository.
+
+---
