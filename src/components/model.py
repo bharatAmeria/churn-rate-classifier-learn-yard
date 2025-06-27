@@ -1,59 +1,72 @@
 import os
 import sys
 import joblib
-import numpy as np
 import pandas as pd
-from xgboost import XGBRegressor
 from src.config import CONFIG
-from sklearn.model_selection import train_test_split
-from sklearn import metrics
-from typing import Union
-from abc import ABC, abstractmethod
 from src.logger import logging
 from src.exception import MyException
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble  import RandomForestClassifier
+from sklearn.metrics import accuracy_score
 
-class ModelTrainingStrategy(ABC):
+class ModelTraining:
 
-    @abstractmethod
-    def handle_training(self, data: pd.DataFrame) -> pd.DataFrame:
-        pass
+    def __init__(self):
+        """Initialize the data ingestion class."""
+        self.config = CONFIG["model_training"]
+        logging.info("Model training class initialized.")
 
-class ModelTrainingConfig(ModelTrainingStrategy):
-
-    def handle_training(self, data: pd.DataFrame) -> pd.DataFrame:
+    def handle_training(self, X_train, X_test, y_train, y_test) -> None:
 
         try:
-            df = data
+            
+            models = {'lg':LogisticRegression(), 
+                      'dtc':DecisionTreeClassifier(),
+                      'rfc':RandomForestClassifier(),
+                      }
+            
+            best_model_name = None
+            best_model = None
+            best_score = 0
 
-            X = df.drop(columns='Item_Outlet_Sales', axis=1)
-            y = df['Item_Outlet_Sales']
+            for name,model in models.items():
+                model.fit(X_train, y_train)
+                ypred = model.predict(X_test)
+                acc = accuracy_score(y_test, ypred)
+                print(f"{name} with accuracy : {acc} ")
 
-            X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=0.2, random_state=2)
+                if acc > best_score:
+                    best_score = acc
+                    best_model_name = name
+                    best_model = model
 
-            regressor = XGBRegressor()
-            regressor.fit(X_train,Y_train)
-            y_pred = regressor.predict(X_test)
+            print(f"\n✅ Best Model: {best_model_name} with Accuracy: {best_score}")
 
-            print(metrics.r2_score(Y_test, y_pred))
+            best_model.fit(X_train, y_train)
 
-            # input = (250,6.89,1,0.136428,13,193.9820,8,1997,2,0,1)
-            # new_input = np.asanyarray(input,dtype=float)
-            # prediciton = regressor.predict(new_input.reshape(1,-1))
-            # print(prediciton)
-
-            model_path = CONFIG["model"]
+            model_path = self.config["model"]
             os.makedirs(os.path.dirname(model_path), exist_ok=True)
-            joblib.dump(regressor,open(model_path,'wb'))
+            joblib.dump(best_model ,open(model_path,'wb'))
 
         except Exception as e:
             logging.error("Error occurred while extracting zip file", exc_info=True)
             raise MyException(e, sys)
 
-class ModelTraining(ModelTrainingStrategy):
-    def __init__(self, data: pd.DataFrame, strategy: ModelTrainingStrategy):
-        self.strategy = strategy
-        self.df = data
 
-    def handle_training(self) -> Union[pd.DataFrame, pd.Series]:
-        """Handle data based on the provided strategy"""
-        return self.strategy.handle_training(self.df)
+    # def prediction(credit_score,country,gender,age,tenure,balance,products_number,credit_card,active_member,estimated_salary):
+    #         features = np.array([[credit_score,country,gender,age,tenure,balance,products_number,credit_card,active_member,estimated_salary]])
+    #         features = sclr.fit_transform(features)
+    #         prediction = rfc.predict(features).reshape(1,-1)
+    #         return prediction[0]
+
+    #         credit_score = 608
+    #         country = 2
+    #         gender = 0
+    #         age= 41
+    #         tenure= 1
+    #         balance = 83807.86
+    #         products_number= 1
+    #         credit_card = 0
+    #         active_member =1
+    #         estimated_salary = 112542.58

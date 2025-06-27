@@ -64,7 +64,7 @@ class DataPreprocess:
             X = self.df.drop(['_id', 'churn', 'customer_id'], axis=1)
             y = self.df.drop('_id', axis=1)
             y = self.df['churn']
-            train_set, test_set, _, _ = train_test_split(X, y, test_size=self.config["TRAIN_TEST_SPLIT_RATIO"], random_state=42)
+            train_set, test_set, y_train, y_test = train_test_split(X, y, test_size=self.config["TRAIN_TEST_SPLIT_RATIO"], random_state=42)
             logging.info("Performed train test split on the dataframe")
             logging.info("Exited split_data_as_train_test method of Data_Ingestion class")
 
@@ -79,6 +79,8 @@ class DataPreprocess:
             os.makedirs(os.path.dirname(self.config["TRAIN_FILE_NAME"]), exist_ok=True)
             pd.DataFrame(X_train).to_csv(self.config["TRAIN_FILE_NAME"], index=False)
             pd.DataFrame(X_test).to_csv(self.config["TEST_FILE_NAME"], index=False, header=True)
+            pd.DataFrame(y_train).to_csv(self.config["TRAIN_LABEL_FILE_NAME"], index=False)
+            pd.DataFrame(y_test).to_csv(self.config["TEST_LABEL_FILE_NAME"], index=False)
 
             logging.info(f"Exported train and test file path.")
         except Exception as e:

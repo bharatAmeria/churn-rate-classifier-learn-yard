@@ -14,10 +14,14 @@ data_ingest:
   TRAIN_LABEL_FILE_NAME: artifacts/data_ingestion/ingested/y_train.csv
   TEST_LABEL_FILE_NAME: artifacts/data_ingestion/ingested/y_test.csv  
 
+model_training :
+  TRAIN_FILE_NAME: "artifacts/data_ingestion/ingested/train.csv"
+  TEST_FILE_NAME: "artifacts/data_ingestion/ingested/test.csv"
+  TRAIN_LABEL_FILE_NAME: artifacts/data_ingestion/ingested/y_train.csv
+  TEST_LABEL_FILE_NAME: artifacts/data_ingestion/ingested/y_test.csv  
+  model: "app/model.pkl"
 
 processed_data_path: "artifacts/processed_data.csv"
-model: "app/model.pkl"
-
 
 # For MongoDB connection
 DATABASE_NAME : "Proj1"

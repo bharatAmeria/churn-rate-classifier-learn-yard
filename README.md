@@ -66,13 +66,44 @@ cd customer-churn-ml
 
 ### 2. Set Up Virtual Environment (Optional)
 
-```bash
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # Windows: venv\Scripts\activate
+    pip install -r requirements.txt
+    ```
 
-### 3. Run with Docker Compose
+  - Run template.py file 
+  - Install requirements :- Run testEnvironment file which test virtual env and install requirements.
+  - Modify setup.py file and project.toml files for Author changes.
+  
+### 3. Data Ingestion
+   
+  -  Raw is downloaded form Google Drive and extract zip file and push the data to MongoDB.
+  -  Now from MongoDB the data is ingested for processing.
+  -  After data processing train_test_split performed 
+  -  All this is added in the src/components directory
+
+### 4. MongoDB Setup
+  
+  - Sign up in MongoDB [Link](https://www.mongodb.com)
+  - Create Orgnainsation.
+  ![Mongo Organisation](assets/Org.png)
+
+  - Create new project.
+  ![New Project](assets/proj.png)
+
+  - After creating project build cluster.
+  ![Project Home](assets/cluster.png)
+
+  - Set cluster to free which allow us to store data upto 512 MBs. Create deployment all settings are default.
+  ![Cluster Building](assets/cluster_making.png)
+
+  - Ater cluster mkaing you will home page like that.
+  ![Cluster Home](assets/cluster_home.png)
+
+  - Now copy connection string by clicking on the connect button. On pop up screen in the drives you will see a connection string copy that and store it in your env folder under the name MONGO_URI
+
+### 4. Run with Docker Compose
 
 ```bash
 docker-compose up --build
