@@ -8,6 +8,9 @@ from dotenv import load_dotenv
 from src.logger import logging
 from src.exception import MyException
 from src.config import CONFIG
+import mlflow
+from datetime import datetime
+
 
 load_dotenv()
 
@@ -19,7 +22,9 @@ class UploadData:
     def __init__(self):
         """Initialize the data ingestion class."""
         self.config = CONFIG["data_upload"]
+        self.mlflow_run = mlflow.start_run(run_name="DataUpload_" + datetime.now().strftime("%Y%m%d_%H%M%S"))
         logging.info("Data Ingestion class initialized.")
+        mlflow.log_param("stage", "data_ingestion")
 
     def download_file(self):
         """ Fetch data from the URL """
@@ -34,9 +39,13 @@ class UploadData:
             prefix = 'https://drive.google.com/uc?/export=download&id='
             gdown.download(prefix + file_id, zip_download_dir)
 
+            mlflow.log_param("dataset_url", dataset_url)
+            mlflow.log_artifact(zip_download_dir, artifact_path="downloads")
+
             logging.info(f"Successfully downloaded data from {dataset_url} into file {zip_download_dir}")
         except Exception as e:
             logging.error("Error occurred while downloading file", exc_info=True)
+            mlflow.log_param("download_status", "failed")
             raise MyException(e, sys)
 
     def extract_zip_file(self):
@@ -52,10 +61,13 @@ class UploadData:
             
             with zipfile.ZipFile(local_data_file, 'r') as zip_ref:
                 zip_ref.extractall(unzip_path)
-            
+
+            mlflow.log_artifact(unzip_path, artifact_path="extracted")
+
             logging.info(f"Successfully extracted zip file to {unzip_path}")
         except Exception as e:
             logging.error("Error occurred while extracting zip file", exc_info=True)
+            mlflow.log_param("extract_status", "failed")
             raise MyException(e, sys)
         
     def push_dataframe_to_mongodb(self, df, db_name, collection_name):
@@ -70,19 +82,24 @@ class UploadData:
         Returns:
             inserted_ids (list): List of inserted document IDs
         """
-        # Convert DataFrame to dictionary
-        data = df.to_dict(orient='records')
+        try:
+            data = df.to_dict(orient='records')
+            connection_url = os.getenv("MONGODB_URI")
 
-        # Get connection string from environment
-        connection_url = os.getenv("MONGODB_URI")
+            if not connection_url:
+                raise ValueError("MONGODB_URI not found in environment variables")
 
-        if not connection_url:
-            raise ValueError("MONGODB_URI not found in environment variables")
+            client = pymongo.MongoClient(connection_url, tlsCAFile=certifi.where())
+            database = client[db_name]
+            collection = database[collection_name]
+            result = collection.insert_many(data)
 
-        # Connect and insert
-        client = pymongo.MongoClient(connection_url, tlsCAFile=certifi.where())
-        database = client[db_name]
-        collection = database[collection_name]
-        result = collection.insert_many(data)
+            mlflow.log_param("mongodb_collection", collection_name)
+            mlflow.log_param("records_inserted", len(result.inserted_ids))
 
-        return result.inserted_ids
+            return result.inserted_ids
+        except Exception as e:
+            mlflow.log_param("mongodb_upload_status", "failed")
+            raise MyException(e, sys)
+        finally:
+            mlflow.end_run()

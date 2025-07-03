@@ -1,6 +1,8 @@
 import os
 import sys
 from pandas import DataFrame
+import mlflow
+from datetime import datetime
 from src.logger import logging
 from src.exception import MyException
 from src.config import CONFIG
@@ -19,44 +21,54 @@ class IngestData:
 
     def export_data_into_feature_store(self):
         """
-        Method Name :   export_data_into_feature_store
-        Description :   This method exports data from mongodb to csv file
-        
-        Output      :   data is returned as artifact of data ingestion components
-        On Failure  :   Write an exception log and then raise an exception
+        Export data from MongoDB to a CSV file and return it as a DataFrame.
+        Logs parameters and artifact with MLflow.
         """
         try:
-            logging.info(f"Exporting data from mongodb")
+            logging.info(f"Exporting data from MongoDB")
+
             my_data = Proj1Data()
             dataframe = my_data.export_collection_as_dataframe()
+
+            rows, cols = dataframe.shape
+            mlflow.log_param("feature_store_rows", rows)
+            mlflow.log_param("feature_store_cols", cols)
+
             logging.info(f"Shape of dataframe: {dataframe.shape}")
-            feature_store_file_path  = self.config["feature_store"]
+
+            feature_store_file_path = self.config["feature_store"]
             dir_path = os.path.dirname(feature_store_file_path)
-            os.makedirs(dir_path,exist_ok=True)
-            logging.info(f"Saving exported data into feature store file path: {feature_store_file_path}")
-            dataframe.to_csv(feature_store_file_path,index=False,header=True)
+            os.makedirs(dir_path, exist_ok=True)
+
+            logging.info(f"Saving exported data to: {feature_store_file_path}")
+            dataframe.to_csv(feature_store_file_path, index=False, header=True)
+
+            mlflow.log_param("feature_store_path", feature_store_file_path)
+            mlflow.log_artifact(feature_store_file_path, artifact_path="feature_store")
+
             return dataframe
 
         except Exception as e:
-            raise MyException(e,sys)
+            mlflow.log_param("feature_store_export", "failed")
+            raise MyException(e, sys)
 
     def initiate_data_ingestion(self):
         """
-        Method Name :   initiate_data_ingestion
-        Description :   This method initiates the data ingestion components of training pipeline 
-        
-        Output      :   train set and test set are returned as the artifacts of data ingestion components
-        On Failure  :   Write an exception log and then raise an exception
+        Orchestrate the data ingestion step. 
+        Logs overall process under a single MLflow run.
         """
-        logging.info("Entered initiate_data_ingestion method of Data_Ingestion class")
+        logging.info("Entered initiate_data_ingestion method of IngestData class")
 
         try:
-            dataframe = self.export_data_into_feature_store()
+            with mlflow.start_run(run_name="DataIngestion_" + datetime.now().strftime("%Y%m%d_%H%M%S")):
+                mlflow.log_param("ingestion_stage", "start")
+                
+                dataframe = self.export_data_into_feature_store()
+                mlflow.log_param("ingestion_status", "success")
 
-            logging.info("Got the data from mongodb")
-
-            # logging.info("Performed train test split on the dataset")
-            logging.info("Exited initiate_data_ingestion method of Data_Ingestion class")
+                logging.info("Got the data from MongoDB")
+                logging.info("Exited initiate_data_ingestion method of IngestData class")
 
         except Exception as e:
-            raise MyException(e, sys) 
+            mlflow.log_param("ingestion_status", "failed")
+            raise MyException(e, sys)

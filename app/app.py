@@ -1,12 +1,12 @@
 import streamlit as st
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-import pickle
+
 
 sclr = StandardScaler()
 
-# loading models
-model = pickle.load(open('model.pkl', 'rb'))
+from joblib import load
+model = load('app/model.pkl')
 
 def prediction(credit_score, country, gender, age, tenure, balance, products_number, credit_card, active_member, estimated_salary):
     # Check for empty strings and handle accordingly
