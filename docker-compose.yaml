@@ -129,5 +129,12 @@ services:
     # The entrypoint.sh will check if the database is ready and then run these commands
     entrypoint: /bin/bash -c '(airflow db init && airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com)'
 
+  # streamlit:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.streamlit
+  #   ports:
+  #     - "8501:8501"
+
 volumes:
   postgres-db-volume:

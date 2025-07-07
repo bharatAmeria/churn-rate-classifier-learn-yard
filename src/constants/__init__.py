@@ -4,8 +4,8 @@ CONFIG_FILE_PATH = Path("config/config.yaml")
 PARAMS_FILE_PATH = Path("params.yaml")
 
 # For MongoDB connection
-DATABASE_NAME = "Proj1"
-COLLECTION_NAME = "Proj1-Data"
+DATABASE_NAME = "Churn_rate" 
+COLLECTION_NAME = "Churn_Data"
 MONGODB_URL_KEY = "MONGODB_URL"
 
 """

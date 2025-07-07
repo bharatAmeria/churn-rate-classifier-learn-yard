@@ -20,6 +20,35 @@ class ModelTraining:
         self.config = CONFIG["model_training"]
         logging.info("Model training class initialized.")
 
+    @staticmethod
+    def setup_dagshub_mlflow(repo_owner: str, repo_name: str, dagshub_token: str):
+        """
+        Sets up MLflow to track experiments using DagsHub.
+        
+        Args:
+            repo_owner (str): DagsHub repository owner (username or organization).
+            repo_name (str): DagsHub repository name.
+            dagshub_token (str): Personal access token for DagsHub.
+
+        Raises:
+            EnvironmentError: If the dagshub_token is not provided.
+        """
+        try: 
+            if not dagshub_token:
+                raise EnvironmentError("DAGSHUB_TOKEN is not provided.")
+
+            os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+            os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+
+            dagshub_url = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
+            os.environ["MLFLOW_TRACKING_URI"] = dagshub_url
+
+            logging.info(f"MLflow tracking URI set to: {dagshub_url}")
+        except MyException as e:
+            logging.info(f"Unexpected error while setting up MLflow tracking: {e}")
+            raise MyException(e, sys)
+
+
     def handle_training(self, X_train, X_test, y_train, y_test) -> None:
         try:
             mlflow.set_experiment("Churn-Model-Training")
@@ -51,7 +80,7 @@ class ModelTraining:
                         best_model_name = name
                         best_model = model
 
-            print(f"\n✅ Best Model: {best_model_name} with Accuracy: {best_score}")
+            logging.info(f"\n✅ Best Model: {best_model_name} with Accuracy: {best_score}")
             logging.info(f"Best Model: {best_model_name} with Accuracy: {best_score}")
 
             # Retrain best model
@@ -67,9 +96,9 @@ class ModelTraining:
                 mlflow.log_param("best_model", best_model_name)
                 mlflow.log_metric("best_accuracy", best_score)
                 mlflow.log_artifact(model_path, artifact_path="models")
-                mlflow.sklearn.log_model(best_model, artifact_path="sk_model")
-
-        except Exception as e:
+                mlflow.sklearn.log_model(sk_model=best_model, artifact_path="sk_model")
+                
+        except MyException as e:
             logging.error("Error occurred during model training", exc_info=True)
             mlflow.log_param("training_status", "failed")
             raise MyException(e, sys)

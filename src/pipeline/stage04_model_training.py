@@ -1,3 +1,4 @@
+import os
 import sys
 import pandas as pd
 from src.logger import logging
@@ -14,11 +15,14 @@ class ModelPipeline:
         config = CONFIG["model_training"]
         X_train = pd.read_csv(config["TRAIN_FILE_NAME"])
         X_test = pd.read_csv(config["TEST_FILE_NAME"])
-        y_train = pd.read_csv(config["TRAIN_LABEL_FILE_NAME"]) 
+        y_train = pd.read_csv(config["TRAIN_LABEL_FILE_NAME"])
         y_test = pd.read_csv(config["TEST_LABEL_FILE_NAME"])
+        dagshub_token = os.getenv("CAPSTONE_TEST")  # Or hardcode for testing (not recommended)
 
         logging.info(">>>>>Model Training Started...<<<<<")
         train = ModelTraining()
+        
+        train.setup_dagshub_mlflow("bharatAmeria", "bug_fixing", dagshub_token)
         train.handle_training(X_train, X_test, y_train, y_test)
         logging.info(">>>>>Model Training Completed<<<<<\n")
 

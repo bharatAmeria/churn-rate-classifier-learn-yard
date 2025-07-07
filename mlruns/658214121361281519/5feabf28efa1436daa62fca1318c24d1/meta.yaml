@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/bharataameriya/Documents/Project/churn-rate-classifier-learn-yard/mlruns/658214121361281519/5feabf28efa1436daa62fca1318c24d1/artifacts
+end_time: 1751866451559
+entry_point_name: ''
+experiment_id: '658214121361281519'
+lifecycle_stage: active
+run_id: 5feabf28efa1436daa62fca1318c24d1
+run_name: HandleData_20250707_110411
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751866451510
+status: 3
+tags: []
+user_id: bharataameriya

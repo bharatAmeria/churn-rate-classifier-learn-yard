@@ -1,6 +1,6 @@
 # 📊 Customer Churn Prediction Pipeline
 
-This project demonstrates a **production-ready, end-to-end Machine Learning pipeline** to predict whether a customer is likely to churn. Built with **Apache Airflow**, **Docker**, and exposed via a **REST API**, the architecture is modular, scalable, and reproducible.
+This project demonstrates a **production-ready, end-to-end Machine Learning pipeline** to predict whether a customer is likely to churn. Built with **Apache Airflow**, **Docker**, and exposed via a **Streamlit APP**, the architecture is modular, scalable, and reproducible.
 
 ---
 
@@ -13,7 +13,7 @@ This project demonstrates a **production-ready, end-to-end Machine Learning pipe
   * **Dockerized** components for reproducibility
   * Deployed using **Docker Compose**
   * Distinct stages: data ingestion → transformation → training → evaluation → packaging
-  * Real-time inference through a **REST API**
+  * Real-time inference through a **Streamlit APP**
 
 ---
 
@@ -34,7 +34,7 @@ This project demonstrates a **production-ready, end-to-end Machine Learning pipe
 * **Purpose:** Simplifies multi-container orchestration.
 * **How:** Spins up Airflow, pipeline services, and the REST API.
 
-### ⚡ REST API (FastAPI / Flask)
+### ⚡ REST API (Streamlit APP)
 
 * **Purpose:** Exposes a `/predict` endpoint for real-time inference.
 * **How:** Loads serialized ML model and processes incoming data.
@@ -51,7 +51,7 @@ This project demonstrates a **production-ready, end-to-end Machine Learning pipe
 * Modular and maintainable architecture.
 * Easily deployable across environments.
 * Clean separation of concerns.
-* Real-time prediction ready via REST API.
+* Real-time prediction ready via Streamlit APP.
 
 ---
 
@@ -127,8 +127,6 @@ Run the `testEnvironment.py` file to automatically set up the virtual environmen
      MONGO_URI="your_mongo_connection_string"
      ```
 
----
-
 ## 5️⃣ Run with Docker Compose
 
 ```bash
@@ -172,6 +170,139 @@ docker compose up airflow-init
 ![Airflow Home](assets/airflow_home_page.png)
 
 ---
+
+🧠 What is MLflow?
+
+**MLflow** is an open-source platform that helps manage the end-to-end ML lifecycle, including:
+
+- 🚀 **Experiment tracking**
+- 📁 **Artifact logging**
+- 📏 **Metrics and parameter logging**
+- 📦 **Model versioning and registry**
+
+---
+
+## 🧩 How MLflow is Used in This Project
+
+MLflow is integrated into the following pipeline stages:
+
+| Stage                 | File/Class                | MLflow Logs                                         |
+|-----------------------|---------------------------|-----------------------------------------------------|
+| 📥 Data Upload        | `UploadData`              | Downloaded file path, download source URL, artifact |
+| 🏗️ Data Ingestion     | `IngestData`              | MongoDB export, feature store path, artifact        |
+| 🧹 Data Preprocessing | `DataPreprocess`          | Column encoding, split ratio, processed file paths  |
+| 🤖 Model Training     | `ModelTraining`           | Model name, accuracy score, model artifacts         |
+
+---
+
+## 📂 MLflow Logging Directory
+
+Logged data will be stored in a default directory like:
+
+---
+
+# 🚀 Deployment Guide: Streamlit App on GCP Compute Engine (Docker + Nginx)
+
+This guide walks you through deploying only the `app/` directory containing your Streamlit prediction app to GCP Compute Engine using Docker and Nginx (reverse proxy).
+
+---
+
+## ✅ 1. Project Structure
+
+Ensure your `app/` directory looks like this:
+
+---
+
+## 🐳 2. Dockerfile (inside `app/`)
+
+Create a `Dockerfile` in `app/`:
+
+```Dockerfile
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+ENV STREAMLIT_SERVER_PORT=8501
+ENV STREAMLIT_SERVER_ENABLECORS=false
+ENV STREAMLIT_SERVER_HEADLESS=true
+
+EXPOSE 8501
+
+CMD ["streamlit", "run", "streamlit_app.py"]
+
+📦 3. Build and Test Locally (Optional)
+
+   ```bash
+   cd app
+   docker build -t streamlit-app .
+   docker run -p 8501:8501 streamlit-app
+   Visit http://localhost:8501 to test.
+   ```
+
+☁️ 4. Transfer Only the app/ Directory to GCP VM
+
+   ```bash
+   gcloud compute scp --recurse ./app your-instance-name:~/ --zone=your-zone
+   ```
+
+🔐 5. SSH Into Your VM
+
+   ```bash
+   gcloud compute ssh your-instance-name --zone=your-zone
+   ```
+
+🐳 6. Build Docker Image on the VM
+
+   ```bash
+   cd ~/app
+   docker build -t streamlit-app .
+   docker run -d -p 8501:8501 --name streamlit-app streamlit-app
+   ```
+
+🌐 7. Set Up Nginx as a Reverse Proxy
+
+   Install Nginx:
+   ```bash
+   sudo apt update
+   sudo apt install nginx -y
+   Create Nginx Config:
+   sudo nano /etc/nginx/sites-available/streamlit
+   Paste the following:
+   ```
+   
+   ```nginx
+   server {
+      listen 80;
+      server_name _;
+
+      location / {
+         proxy_pass http://localhost:8501;
+         proxy_set_header Host $host;
+         proxy_set_header X-Real-IP $remote_addr;
+      }
+   }
+   ```
+
+   Enable Nginx Config:
+
+   ```bash
+   sudo ln -s /etc/nginx/sites-available/streamlit /etc/nginx/sites-enabled
+   sudo rm /etc/nginx/sites-enabled/default
+   sudo systemctl restart nginx
+   ```
+
+🌍 8. Access Your Streamlit App
+
+   Visit your app in a browser:
+
+   ```cpp
+   http://<GCP_VM_EXTERNAL_IP>
+   ```
 
 ## 📬 Contact
 

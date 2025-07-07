@@ -1,0 +1,146 @@
+1. Create repo, clone it in local
+
+2. Create a virtual environment -> pyhton3 -m venv venv
+
+3. Activate the virtual environment -> source venv/bin/Activate
+
+4. Create template.py file and copy code and runt it ( it create a project structure for you )
+
+5. Add code to setup.py, project.toml, testEnvironment.py, requirements.txt, src/constants/__init__.py.
+    Now run testEnvironment.py (verifies the pyhton environment and install dependecies from requirements.txt)
+
+6. Add code to below files/folders inside src dir:
+    - src/logger/__init__.py
+    - src/exception/__init__.py
+    - src/config/__init__.py
+    - src/components/data_ingestion.py
+    - src/components/data_processing.py
+    - src/config/__init__.py
+    - src/components/model.py
+    - src/pipeline/stage01_data_ingestion.py
+    - src/pipeline/stage02_data_processing.py
+    - src/pipeline/stage04_model_training.py
+    - config.yaml
+    - src/data_fetch/bank_churn_data.py
+    - src/connection/mongo_conn.py
+
+7.  Refer to readme file for mongoDB setup. Ater setup tehre is connection url store it in the .env folder (MONGODB_URI)
+
+8. To test the pipeline locally. so the at all components are working correctly. 
+   Add to train.py file and run. 
+   It should run without showing any error.
+
+------------------------- Airflow ---------------------------
+1. Create these folders -> dags, logs, plugins, config
+2. Start docker-desktop (check "docker --version" & "docker-compose --version") & add dockerfile
+
+3. Check latest apache airflow releases and accordingly download the docker-compose.yaml file -
+                                ***Bash Command***
+   curl -LfO 'https://airflow.apache.org/docs/apache-airflow/3.0.1/docker-compose.yaml'
+                                ***Powershell Command***
+   Invoke-WebRequest -Uri 'https://airflow.apache.org/docs/apache-airflow/2.10.5/docker-compose.yaml' -OutFile 'docker-compose.yaml'
+
+4. Windows users -> Instead of following step3, use the provided 'docker-compose.yaml' file 
+5. On terminal - "docker-compose up -d"
+   This will:
+    >> Download all required images
+    >> Initialize the database
+    >> Create an admin user (username: admin, password: admin)
+    >> Start all Airflow services
+
+6. (Wait few minutes before proceeding) Access Airflow Web UI ->
+    >> Open your web browser and go to: http://localhost:8080
+    >> Login with: Username: admin, Password: admin
+
+7. Common Commands ->
+    >> Stop Airflow: docker-compose down
+    >> Restart Airflow: docker-compose down && docker-compose up -d
+    >> View logs: docker-compose logs -f
+    >> Check running containers: docker ps
+
+This setup gives you a complete Airflow environment with:
+    >> PostgreSQL as the metadata database
+    >> Redis as the message broker
+    >> CeleryExecutor for parallel task execution
+    >> Web UI, scheduler, and worker services
+
+------------------------- Docker Image ---------------------------
+1. Setup Docker image for our web app. Creat a dockerfile named( app/Dockerfile ) and add code to it.
+2. remeber to Start docker-desktop.
+3. Command to build our image -> docker build -f Dockerfile -t streamlit-app .
+4. Now test out Docker image -> docker run -p 8501:8501 streamlit-app  
+    
+    { Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+
+
+      You can now view your Streamlit app in your browser.
+
+      Local URL: http://localhost:8501
+      Network URL: 
+      External URL:   
+    }
+
+    should give output like this on successful execution.
+
+------------------------- Google Cloud Platform Setup ---------------------------
+1. Open Google Cloud Console
+2. Navigate to: Compute Engine > VM instances
+3. Click Create Instance > 
+    Region: Choose closest region 
+    Machine type: e2-medium or higher
+    Boot disk: Ubuntu 22.04
+    Allow HTTP & HTTPS traffic
+    Firewall: ✅ Allow both
+
+4. Create and enable SSH access
+5. give command -> gcloud compute ssh YOUR_INSTANCE_NAME --zone=YOUR_ZONE  (replace your YOUR_INSTANCE_NAME, YOUR_ZONE)
+6. Install Docker on VM by using below command.
+     
+    sudo apt update
+    sudo apt install docker.io -y
+    sudo usermod -aG docker $USER
+    newgrp docker
+
+7. Tranfer the app using -> gcloud compute scp --recurse ./app your-instance-name:~/ --zone=your-zone
+8. SSH into VM & Build Docker Image -> SSH into VM & Build Docker Image
+
+    cd ~/app
+    docker build -t streamlit-app .
+    docker run -d -p 8501:8501 --name streamlit-app streamlit-app
+
+9. Set Up Nginx (Reverse Proxy) -> 
+    sudo apt update 
+    sudo apt install nginx -y
+
+10. Configure Nginx -> sudo nano /etc/nginx/sites-available/streamlit
+
+    and paste the below code
+
+    server {
+        listen 80;
+        server_name _;
+
+        location / {
+            proxy_pass http://localhost:8501;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+    }
+
+11. Configure setting 
+
+    sudo ln -s /etc/nginx/sites-available/streamlit /etc/nginx/sites-enabled
+    sudo rm /etc/nginx/sites-enabled/default
+    sudo systemctl restart nginx
+
+12. Access App -> http://<GCP_VM_EXTERNAL_IP>
+
+
+
+
+
+ 
+
+
+
+   

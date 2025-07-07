@@ -17,7 +17,7 @@ class DataUploadPipeline:
         df = pd.read_csv("artifacts/Bank Customer Churn Prediction.csv")
 
         # Call the function
-        inserted = upload.push_dataframe_to_mongodb(df, "Proj1", "Proj1-Data")
+        inserted = upload.push_dataframe_to_mongodb(df, "Churn_rate", "Churn_Data")
         print(f"{len(inserted)} documents inserted.")
 
 
