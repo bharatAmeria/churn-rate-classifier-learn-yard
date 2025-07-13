@@ -64,83 +64,78 @@ This setup gives you a complete Airflow environment with:
     >> CeleryExecutor for parallel task execution
     >> Web UI, scheduler, and worker services
 
-------------------------- Docker Image ---------------------------
-1. Setup Docker image for our web app. Creat a dockerfile named( app/Dockerfile ) and add code to it.
-2. remeber to Start docker-desktop.
-3. Command to build our image -> docker build -f Dockerfile -t streamlit-app .
-4. Now test out Docker image -> docker run -p 8501:8501 streamlit-app  
-    
-    { Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
-
-
-      You can now view your Streamlit app in your browser.
-
-      Local URL: http://localhost:8501
-      Network URL: 
-      External URL:   
-    }
-
-    should give output like this on successful execution.
-
 ------------------------- Google Cloud Platform Setup ---------------------------
+
 1. Open Google Cloud Console
 2. Navigate to: Compute Engine > VM instances
-3. Click Create Instance > 
+3. Search for Compute Engine API and enable It.
+
+4. genrate ssh key and also add to gitignore file so that you do not commit accidently 
+
+    { ssh-keygen -t rsa -f .ssh/google_compute_engine -C bharataameriya }
+    
+5. enable compute enginve api first if not enabled
+    { vi google_compute_engine.pub }  this opens google_compute_engine.pub file copy and key follow below step.
+
+    If you want to do it manually.
+    now navigate to google console > navigation > compute engine > metadata> ssh keys
+    (where we upload the keys) and save the key
+
+    Otherwise
+    { gcloud compute os-login ssh-keys add --key-file=.ssh/google_compute_engine.pub }
+
+6. now navigate to google console > navigation > compute engine > metadata> ssh keys
+   (where we upload the keys) and save the key
+
+7. Click Create Instance > 
     Region: Choose closest region 
     Machine type: e2-medium or higher
     Boot disk: Ubuntu 22.04
     Allow HTTP & HTTPS traffic
     Firewall: ✅ Allow both
 
-4. Create and enable SSH access
-5. give command -> gcloud compute ssh YOUR_INSTANCE_NAME --zone=YOUR_ZONE  (replace your YOUR_INSTANCE_NAME, YOUR_ZONE)
-6. Install Docker on VM by using below command.
-     
+8. gcloud compute scp --recurse ./app INSTANCE_NAME:~/ --zone=ZONE
+
+9. copy the external in to connect our instance -> ssh -i <private key> <username>@<external IP>
+   (for eg. -> ssh -i gcp bharataameriya@35.239.6.247)
+
+10. Install Docker on GCP VM    
     sudo apt update
     sudo apt install docker.io -y
     sudo usermod -aG docker $USER
-    newgrp docker
+    newgrp docker  # Apply use
 
-7. Tranfer the app using -> gcloud compute scp --recurse ./app your-instance-name:~/ --zone=your-zone
-8. SSH into VM & Build Docker Image -> SSH into VM & Build Docker Image
+    Test Docker:
+     docker run hello-world
 
-    cd ~/app
-    docker build -t streamlit-app .
-    docker run -d -p 8501:8501 --name streamlit-app streamlit-app
+7. cd app
+   docker build -t app .
+   docker run -d -p 80:8000 app
 
-9. Set Up Nginx (Reverse Proxy) -> 
-    sudo apt update 
-    sudo apt install nginx -y
+8. http://<EXTERNAL_VM_IP>
 
-10. Configure Nginx -> sudo nano /etc/nginx/sites-available/streamlit
 
-    and paste the below code
 
-    server {
-        listen 80;
-        server_name _;
+------------------------- Google Cloud Instance Cleanup ---------------------------
+1. Delete any Docker Images on your Instance ->
+            docker image rm app
+            docker system prune -a
 
-        location / {
-            proxy_pass http://localhost:8501;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-        }
-    }
+2. Delete Instance -> gcloud compute instances delete <instance-id> --zone=YOUR_ZONE --quiet
+3. Delete FIREWALL RULE -> gcloud compute firewall-rules delete default-allow-http --quiet
+4. SSh Keys -> 
+            gcloud compute os-login ssh-keys list
+            gcloud compute os-login ssh-keys remove --key <KEY_STRING_OR_FINGERPRINT>
 
-11. Configure setting 
+5. Now to Disable Api Nvaigate to APIs enabled and services. Disable all the APIs
 
-    sudo ln -s /etc/nginx/sites-available/streamlit /etc/nginx/sites-enabled
-    sudo rm /etc/nginx/sites-enabled/default
-    sudo systemctl restart nginx
+6. Check Billing -> 
+            gcloud compute instances list
+            gcloud compute disks list
+            gcloud compute firewall-rules list
 
-12. Access App -> http://<GCP_VM_EXTERNAL_IP>
+7. Now Delete the project if you want to.
 
 
 
 
-
- 
-
-
-
-   

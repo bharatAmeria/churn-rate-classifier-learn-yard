@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer Churn Prediction</title>
+</head>
+<body>
+    <h2>Enter Customer Details</h2>
+    <form method="post" action="/predict-form">
+        <label>Credit Score: <input type="number" name="credit_score" step="any" required></label><br>
+        <label>Country:
+            <select name="country">
+                <option value="France">France</option>
+                <option value="Spain">Spain</option>
+                <option value="Germany">Germany</option>
+            </select>
+        </label><br>
+        <label>Gender:
+            <select name="gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+        </label><br>
+        <label>Age: <input type="number" name="age" step="any" required></label><br>
+        <label>Tenure: <input type="number" name="tenure" step="any" required></label><br>
+        <label>Balance: <input type="number" name="balance" step="any" required></label><br>
+        <label>Products Number: <input type="number" name="products_number" step="any" required></label><br>
+        <label>Credit Card (0 or 1): <input type="number" name="credit_card" required></label><br>
+        <label>Active Member (0 or 1): <input type="number" name="active_member" required></label><br>
+        <label>Estimated Salary: <input type="number" name="estimated_salary" step="any" required></label><br>
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if result %}
+        <h3>Result: {{ result }}</h3>
+    {% endif %}
+</body>
+</html>

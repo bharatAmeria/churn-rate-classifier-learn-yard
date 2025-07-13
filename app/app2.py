@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 sclr = StandardScaler()
 
 from joblib import load
-model = load('app/model.pkl')
+model = load('model.pkl')
 
 def prediction(credit_score, country, gender, age, tenure, balance, products_number, credit_card, active_member, estimated_salary):
     # Check for empty strings and handle accordingly
