@@ -31,38 +31,11 @@
    It should run without showing any error.
 
 ------------------------- Airflow ---------------------------
-1. Create these folders -> dags, logs, plugins, config
-2. Start docker-desktop (check "docker --version" & "docker-compose --version") & add dockerfile
-
-3. Check latest apache airflow releases and accordingly download the docker-compose.yaml file -
-                                ***Bash Command***
-   curl -LfO 'https://airflow.apache.org/docs/apache-airflow/3.0.1/docker-compose.yaml'
-                                ***Powershell Command***
-   Invoke-WebRequest -Uri 'https://airflow.apache.org/docs/apache-airflow/2.10.5/docker-compose.yaml' -OutFile 'docker-compose.yaml'
-
-4. Windows users -> Instead of following step3, use the provided 'docker-compose.yaml' file 
-5. On terminal - "docker-compose up -d"
-   This will:
-    >> Download all required images
-    >> Initialize the database
-    >> Create an admin user (username: admin, password: admin)
-    >> Start all Airflow services
-
-6. (Wait few minutes before proceeding) Access Airflow Web UI ->
-    >> Open your web browser and go to: http://localhost:8080
-    >> Login with: Username: admin, Password: admin
-
-7. Common Commands ->
-    >> Stop Airflow: docker-compose down
-    >> Restart Airflow: docker-compose down && docker-compose up -d
-    >> View logs: docker-compose logs -f
-    >> Check running containers: docker ps
-
-This setup gives you a complete Airflow environment with:
-    >> PostgreSQL as the metadata database
-    >> Redis as the message broker
-    >> CeleryExecutor for parallel task execution
-    >> Web UI, scheduler, and worker services
+1. Download Astro CLI to manage airflow. -> brew install astro 
+2. Initialize astro -> astro dev init
+3. Copy dockerfile, docker-compose file.
+4. Copy files in the dags folder for Airflow.
+5. Start airflow using -> astro dev start (this will start airflow and PostgreSQL)
 
 ------------------------- Google Cloud Platform Setup ---------------------------
 
@@ -74,7 +47,7 @@ This setup gives you a complete Airflow environment with:
 
     { ssh-keygen -t rsa -f .ssh/google_compute_engine -C bharataameriya }
     
-5. enable compute enginve api first if not enabled
+5. enable compute engine api first if not enabled
     { vi google_compute_engine.pub }  this opens google_compute_engine.pub file copy and key follow below step.
 
     If you want to do it manually.
@@ -115,6 +88,57 @@ This setup gives you a complete Airflow environment with:
 8. http://<EXTERNAL_VM_IP>
 
 
+------------------------- Airflow (In GCP)---------------------------
+1. SSH into your GCP VM :- 
+gcloud compute ssh <your-vm-name> --zone <your-zone>
+
+2. Install dependencies:
+sudo apt update && sudo apt install -y \
+    curl \
+    git \
+    docker.io \
+    docker-compose \
+    python3 \
+    python3-pip
+
+3. Enable Docker for your user:
+sudo usermod -aG docker $USER
+newgrp docker  # Apply group change
+
+4. Install Astro CLI
+curl -sSL https://install.astronomer.io | sudo bash
+
+5. Confirm install:
+astro version
+
+6. Create a New Astro Project
+mkdir airflow-gcp && cd airflow-gcp
+astro dev init
+
+7. This will create a project structure like:
+airflow-gcp/
+├── dags/
+├── Dockerfile
+├── include/
+├── plugins/
+├── requirements.txt
+├── packages.txt
+├── airflow_settings.yaml
+
+8. Start Airflow Locally
+astro dev start
+
+9. Access Airflow UI
+If running directly in GCP VM, open Airflow at: http://<VM_EXTERNAL_IP>:8080
+(You may need to allow traffic on port 8080 from GCP:)
+
+-> In GCP Console:
+    VPC Network > Firewall Rules > Create Rule:
+    Name: allow-airflow
+    Targets: All instances in the network
+    Protocols/Ports: tcp:8080
+    Source: 0.0.0.0/0 (or restrict to your IP)
+
 
 ------------------------- Google Cloud Instance Cleanup ---------------------------
 1. Delete any Docker Images on your Instance ->
@@ -135,7 +159,3 @@ This setup gives you a complete Airflow environment with:
             gcloud compute firewall-rules list
 
 7. Now Delete the project if you want to.
-
-
-
-

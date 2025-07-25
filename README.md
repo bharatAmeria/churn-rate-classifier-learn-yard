@@ -264,39 +264,7 @@ CMD ["streamlit", "run", "streamlit_app.py"]
    docker run -d -p 8501:8501 --name streamlit-app streamlit-app
    ```
 
-🌐 7. Set Up Nginx as a Reverse Proxy
-
-   Install Nginx:
-   ```bash
-   sudo apt update
-   sudo apt install nginx -y
-   Create Nginx Config:
-   sudo nano /etc/nginx/sites-available/streamlit
-   Paste the following:
-   ```
-   
-   ```nginx
-   server {
-      listen 80;
-      server_name _;
-
-      location / {
-         proxy_pass http://localhost:8501;
-         proxy_set_header Host $host;
-         proxy_set_header X-Real-IP $remote_addr;
-      }
-   }
-   ```
-
-   Enable Nginx Config:
-
-   ```bash
-   sudo ln -s /etc/nginx/sites-available/streamlit /etc/nginx/sites-enabled
-   sudo rm /etc/nginx/sites-enabled/default
-   sudo systemctl restart nginx
-   ```
-
-🌍 8. Access Your Streamlit App
+🌍 7. Access Your Streamlit App
 
    Visit your app in a browser:
 

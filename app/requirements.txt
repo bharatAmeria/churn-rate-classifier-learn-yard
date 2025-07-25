@@ -1,4 +1,9 @@
-streamlit
 pandas
+fastapi
+uvicorn
 scikit-learn
 joblib
+pydantic
+numpy
+jinja2
+python-multipart
