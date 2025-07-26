@@ -51,7 +51,7 @@ class ModelTraining:
 
     def handle_training(self, X_train, X_test, y_train, y_test) -> None:
         try:
-            mlflow.set_experiment("Churn-Model-Training")
+            mlflow.set_experiment("Churn-Model-Training-v2")
 
             models = {
                 'lg': LogisticRegression(),
@@ -95,8 +95,15 @@ class ModelTraining:
             with mlflow.start_run(run_name=f"best_model_{best_model_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"):
                 mlflow.log_param("best_model", best_model_name)
                 mlflow.log_metric("best_accuracy", best_score)
+
+                # Upload raw .pkl model artifact
                 mlflow.log_artifact(model_path, artifact_path="models")
-                mlflow.sklearn.log_model(sk_model=best_model, artifact_path="sk_model")
+
+                # Upload via sklearn logger
+                # mlflow.sklearn.log_model(sk_model=best_model, artifact_path="sk_model")
+
+                logging.info("Logged model to MLflow")
+
                 
         except MyException as e:
             logging.error("Error occurred during model training", exc_info=True)

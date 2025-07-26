@@ -24,11 +24,18 @@
     - src/data_fetch/bank_churn_data.py
     - src/connection/mongo_conn.py
 
-7.  Refer to readme file for mongoDB setup. Ater setup tehre is connection url store it in the .env folder (MONGODB_URI)
+7. Refer to readme file for mongoDB setup. Ater setup there is connection url store it in the .env folder (MONGODB_URI)
 
 8. To test the pipeline locally. so the at all components are working correctly. 
    Add to train.py file and run. 
    It should run without showing any error.
+
+9. Go to: https://dagshub.com/dashboard
+10. Create > New Repo > Connect a repo > (Github) Connect > Select your repo > Connect
+11. Copy experiment tracking url and code snippet. (Also try: Go To MLFlow UI)
+    dagshub.init(repo_owner='your_repo_owner_name', repo_name='youre_repo_name', mlflow=True)
+
+12. pip install dagshub & mlflow
 
 ------------------------- Airflow ---------------------------
 1. Download Astro CLI to manage airflow. -> brew install astro 
@@ -51,7 +58,7 @@
     { vi google_compute_engine.pub }  this opens google_compute_engine.pub file copy and key follow below step.
 
     If you want to do it manually.
-    now navigate to google console > navigation > compute engine > metadata> ssh keys
+    now navigate to google console > navigation > compute engine > metadata > ssh keys
     (where we upload the keys) and save the key
 
     Otherwise
