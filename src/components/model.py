@@ -4,7 +4,6 @@ import joblib
 import mlflow
 import mlflow.sklearn
 from datetime import datetime
-import pandas as pd
 from src.config import CONFIG
 from src.logger import logging
 from src.exception import MyException
@@ -100,7 +99,7 @@ class ModelTraining:
                 mlflow.log_artifact(model_path, artifact_path="models")
 
                 # Upload via sklearn logger
-                # mlflow.sklearn.log_model(sk_model=best_model, artifact_path="sk_model")
+                mlflow.sklearn.log_model(sk_model=best_model, artifact_path="sk_model")
 
                 logging.info("Logged model to MLflow")
 
@@ -109,22 +108,3 @@ class ModelTraining:
             logging.error("Error occurred during model training", exc_info=True)
             mlflow.log_param("training_status", "failed")
             raise MyException(e, sys)
-
-
-
-    # def prediction(credit_score,country,gender,age,tenure,balance,products_number,credit_card,active_member,estimated_salary):
-    #         features = np.array([[credit_score,country,gender,age,tenure,balance,products_number,credit_card,active_member,estimated_salary]])
-    #         features = sclr.fit_transform(features)
-    #         prediction = rfc.predict(features).reshape(1,-1)
-    #         return prediction[0]
-
-    #         credit_score = 608
-    #         country = 2
-    #         gender = 0
-    #         age= 41
-    #         tenure= 1
-    #         balance = 83807.86
-    #         products_number= 1
-    #         credit_card = 0
-    #         active_member =1
-    #         estimated_salary = 112542.58
