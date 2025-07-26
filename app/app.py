@@ -5,17 +5,26 @@ from pydantic import BaseModel
 from joblib import load
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+<<<<<<< HEAD
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
+=======
+import pickle
+>>>>>>> parent of 913bd58 (mlflow integration)
 
 # Load model and pre-fitted scaler
 model = load("model.pkl")
 scaler = StandardScaler()
 
+<<<<<<< HEAD
 # Mappings for categorical variables
 country_map = {"France": 0, "Spain": 1, "Germany": 2}
 gender_map = {"Female": 0, "Male": 1}
+=======
+# loading models
+model = pickle.load(open('model.pkl', 'rb'))
+>>>>>>> parent of 913bd58 (mlflow integration)
 
 # ---------- Data Model for JSON ----------
 class CustomerData(BaseModel):
