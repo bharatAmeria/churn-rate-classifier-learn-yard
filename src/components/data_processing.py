@@ -21,6 +21,34 @@ class DataPreprocess:
         self.df = None
         logging.info("Data Processing class initialized.")
 
+    @staticmethod
+    def setup_dagshub_mlflow(repo_owner: str, repo_name: str, dagshub_token: str):
+        """
+        Sets up MLflow to track experiments using DagsHub.
+        
+        Args:
+            repo_owner (str): DagsHub repository owner (username or organization).
+            repo_name (str): DagsHub repository name.
+            dagshub_token (str): Personal access token for DagsHub.
+
+        Raises:
+            EnvironmentError: If the dagshub_token is not provided.
+        """
+        try: 
+            if not dagshub_token:
+                raise EnvironmentError("DAGSHUB_TOKEN is not provided.")
+
+            os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+            os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+
+            dagshub_url = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
+            os.environ["MLFLOW_TRACKING_URI"] = dagshub_url
+
+            logging.info(f"MLflow tracking URI set to: {dagshub_url}")
+        except MyException as e:
+            logging.info(f"Unexpected error while setting up MLflow tracking: {e}")
+            raise MyException(e, sys)
+
     def handle_data(self, data: pd.DataFrame) -> pd.DataFrame:
         """
         Removes columns which are not required, fills missing values with median average values,
@@ -45,7 +73,6 @@ class DataPreprocess:
 
                 mlflow.log_param("columns_encoded", ['gender', 'country'])
                 mlflow.log_param("processed_shape", df.shape)
-                mlflow.log_artifact(save_path, artifact_path="processed_data")
 
                 logging.info(f"Successfully saved processed data to {save_path}")
 
@@ -94,11 +121,6 @@ class DataPreprocess:
                 pd.DataFrame(X_test).to_csv(self.config["TEST_FILE_NAME"], index=False, header=True)
                 pd.DataFrame(y_train).to_csv(self.config["TRAIN_LABEL_FILE_NAME"], index=False)
                 pd.DataFrame(y_test).to_csv(self.config["TEST_LABEL_FILE_NAME"], index=False)
-
-                mlflow.log_artifact(self.config["TRAIN_FILE_NAME"], artifact_path="split")
-                mlflow.log_artifact(self.config["TEST_FILE_NAME"], artifact_path="split")
-                mlflow.log_artifact(self.config["TRAIN_LABEL_FILE_NAME"], artifact_path="split")
-                mlflow.log_artifact(self.config["TEST_LABEL_FILE_NAME"], artifact_path="split")
 
                 logging.info("Exported train and test file paths.")
 

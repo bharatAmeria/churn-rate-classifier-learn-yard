@@ -95,9 +95,6 @@ class ModelTraining:
                 mlflow.log_param("best_model", best_model_name)
                 mlflow.log_metric("best_accuracy", best_score)
 
-                # Upload raw .pkl model artifact
-                mlflow.log_artifact(model_path, artifact_path="models")
-
                 # Upload via sklearn logger
                 mlflow.sklearn.log_model(sk_model=best_model, artifact_path="sk_model")
 

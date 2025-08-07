@@ -19,6 +19,34 @@ class IngestData:
         self.config = CONFIG["data_ingest"]
         logging.info("Data Ingestion class initialized.")
 
+    @staticmethod
+    def setup_dagshub_mlflow(repo_owner: str, repo_name: str, dagshub_token: str):
+        """
+        Sets up MLflow to track experiments using DagsHub.
+        
+        Args:
+            repo_owner (str): DagsHub repository owner (username or organization).
+            repo_name (str): DagsHub repository name.
+            dagshub_token (str): Personal access token for DagsHub.
+
+        Raises:
+            EnvironmentError: If the dagshub_token is not provided.
+        """
+        try: 
+            if not dagshub_token:
+                raise EnvironmentError("DAGSHUB_TOKEN is not provided.")
+
+            os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+            os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+
+            dagshub_url = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
+            os.environ["MLFLOW_TRACKING_URI"] = dagshub_url
+
+            logging.info(f"MLflow tracking URI set to: {dagshub_url}")
+        except MyException as e:
+            logging.info(f"Unexpected error while setting up MLflow tracking: {e}")
+            raise MyException(e, sys)
+
     def export_data_into_feature_store(self):
         """
         Export data from MongoDB to a CSV file and return it as a DataFrame.
@@ -44,7 +72,6 @@ class IngestData:
             dataframe.to_csv(feature_store_file_path, index=False, header=True)
 
             mlflow.log_param("feature_store_path", feature_store_file_path)
-            mlflow.log_artifact(feature_store_file_path, artifact_path="feature_store")
 
             return dataframe
 
@@ -63,7 +90,7 @@ class IngestData:
             with mlflow.start_run(run_name="DataIngestion_" + datetime.now().strftime("%Y%m%d_%H%M%S")):
                 mlflow.log_param("ingestion_stage", "start")
                 
-                dataframe = self.export_data_into_feature_store()
+                self.export_data_into_feature_store()
                 mlflow.log_param("ingestion_status", "success")
 
                 logging.info("Got the data from MongoDB")
