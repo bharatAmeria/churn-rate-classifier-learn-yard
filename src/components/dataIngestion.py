@@ -87,6 +87,8 @@ class IngestData:
         logging.info("Entered initiate_data_ingestion method of IngestData class")
 
         try:
+
+            
             with mlflow.start_run(run_name="DataIngestion_" + datetime.now().strftime("%Y%m%d_%H%M%S")):
                 mlflow.log_param("ingestion_stage", "start")
                 
@@ -99,3 +101,11 @@ class IngestData:
         except Exception as e:
             mlflow.log_param("ingestion_status", "failed")
             raise MyException(e, sys)
+ 
+    def __del__(self):
+        """Cleanup method to ensure MLflow run is ended."""
+        try:
+            if hasattr(self, 'mlflow_run') and self.mlflow_run:
+                mlflow.end_run()
+        except:
+            pass

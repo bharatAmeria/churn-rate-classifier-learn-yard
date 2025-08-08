@@ -1,3 +1,4 @@
+import os
 import sys
 from src.logger import logging
 from src.exception import MyException
@@ -10,7 +11,9 @@ class DataIngestionPipeline:
 
     @staticmethod
     def main():
+        dagshub_token = os.getenv("CAPSTONE_TEST")
         ingestor = IngestData()
+        ingestor.setup_dagshub_mlflow("bharatAmeria", "bug_fixing", dagshub_token)
         ingestor.initiate_data_ingestion()
         return
 

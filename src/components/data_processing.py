@@ -55,7 +55,7 @@ class DataPreprocess:
         and converts the data type to float.
         """
         try:
-            mlflow.set_experiment("Churn-Preprocessing")
+            mlflow.set_experiment("Churn_data processing")
             with mlflow.start_run(run_name="HandleData_" + datetime.now().strftime("%Y%m%d_%H%M%S")):
 
                 df = data.copy()
@@ -93,8 +93,8 @@ class DataPreprocess:
         try:
             if self.df is None:
                 raise ValueError("Data must be processed first using `handle_data()` before splitting.")
-
-            mlflow.set_experiment("Churn-Preprocessing")
+            
+            mlflow.set_experiment("Churn_data processing")
             with mlflow.start_run(run_name="SplitData_" + datetime.now().strftime("%Y%m%d_%H%M%S")):
 
                 X = self.df.drop(['churn'], axis=1)
@@ -127,4 +127,12 @@ class DataPreprocess:
         except Exception as e:
             mlflow.log_param("split_status", "failed")
             raise MyException(e, sys)
+        
+    def __del__(self):
+        """Cleanup method to ensure MLflow run is ended."""
+        try:
+            if hasattr(self, 'mlflow_run') and self.mlflow_run:
+                mlflow.end_run()
+        except:
+            pass
     

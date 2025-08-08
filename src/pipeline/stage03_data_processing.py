@@ -1,3 +1,4 @@
+import os
 import sys
 import pandas as pd
 from src.constants import *
@@ -15,9 +16,11 @@ class DataProcessingPipeline:
         config = CONFIG["data_ingest"]
         
         data = pd.read_csv(config["feature_store"])
+        dagshub_token = os.getenv("CAPSTONE_TEST")
 
         logging.info(">>>>>Data Preprocessing Started...<<<<<")
         data_cleaning = DataPreprocess()
+        data_cleaning.setup_dagshub_mlflow("bharatAmeria", "bug_fixing", dagshub_token)
         data_cleaning.handle_data(data=data)
         data_cleaning.split_data_as_train_test()
         logging.info(">>>>>Data Preprocessing Completed<<<<<\n")

@@ -1,3 +1,4 @@
+import os
 import sys
 import pandas as pd
 from src.constants import *
@@ -11,7 +12,9 @@ class DataUploadPipeline:
 
     @staticmethod
     def main():
+        dagshub_token = os.getenv("CAPSTONE_TEST")
         upload = UploadData()
+        upload.setup_dagshub_mlflow("bharatAmeria", "bug_fixing", dagshub_token)
         upload.download_file()
         upload.extract_zip_file()
         df = pd.read_csv("artifacts/Bank Customer Churn Prediction.csv")

@@ -8,6 +8,9 @@ DATABASE_NAME = "Churn_rate"
 COLLECTION_NAME = "Churn_Data"
 MONGODB_URL_KEY = "MONGODB_URL"
 
+
+REPO_OWNER = "bharatAmeria"
+REPO_NAME = "bug_fixing"
 """
 ---------------------------------------------------------------
 Training Pipeline related constant start with DATA_INGESTION VAR NAME

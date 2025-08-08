@@ -96,7 +96,7 @@ class ModelTraining:
                 mlflow.log_metric("best_accuracy", best_score)
 
                 # Upload via sklearn logger
-                mlflow.sklearn.log_model(sk_model=best_model, artifact_path="sk_model")
+                # mlflow.sklearn.log_model(sk_model=best_model, artifact_path="sk_model", registered_model_name=None)
 
                 logging.info("Logged model to MLflow")
 
@@ -105,3 +105,11 @@ class ModelTraining:
             logging.error("Error occurred during model training", exc_info=True)
             mlflow.log_param("training_status", "failed")
             raise MyException(e, sys)
+
+    def __del__(self):
+        """Cleanup method to ensure MLflow run is ended."""
+        try:
+            if hasattr(self, 'mlflow_run') and self.mlflow_run:
+                mlflow.end_run()
+        except:
+            pass
